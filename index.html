@@ -259,6 +259,7 @@
         .then(stream => {
             video.srcObject = stream;
             video.style.display = 'block';
+            console.log("Cámara iniciada correctamente");
         })
         .catch(error => console.error('Error accediendo a la cámara:', error));
 
@@ -371,6 +372,7 @@ navigator.mediaDevices.getUserMedia({ video: true })
     .then(userStream => {
         stream = userStream;
         video.srcObject = stream;
+        console.log("Cámara iniciada correctamente");
     })
     .catch(error => console.error('Error accediendo a la cámara:', error));
 }
