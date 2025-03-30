@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cámara y Galería</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #1a1a1a;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 90%;
+            max-width: 400px;
+            perspective: 1000px;
+        }
+        .card {
+            width: 100%;
+            height: 500px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        .side {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        .front {
+            background: #222;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .back {
+            background: #fff;
+            transform: rotateY(180deg);
+            padding: 10px;
+            overflow-y: auto;
+        }
+        video, canvas {
+            width: 100%;
+            border-radius: 10px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+        .capture { background: #28a745; color: white; }
+        .flip { background: #007bff; color: white; }
+        .download { background: #dc3545; color: white; display: none; }
+        .gallery img {
+            width: 100%;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card" id="card">
+            <div class="side front">
+                <video id="video" autoplay></video>
+                <canvas id="canvas" style="display:none;"></canvas>
+                <button class="capture" id="capture">Tomar Foto</button>
+                <a class="download" id="download">Descargar Foto</a>
+                <button class="flip" id="flip">Ver Galería</button>
+            </div>
+            <div class="side back">
+                <div class="gallery">
+                    <img src="https://via.placeholder.com/400" alt="Imagen 1">
+                    <img src="https://via.placeholder.com/400" alt="Imagen 2">
+                    <img src="https://via.placeholder.com/400" alt="Imagen 3">
+                </div>
+                <button class="flip" id="flipBack">Volver a la Cámara</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const captureBtn = document.getElementById('capture');
+        const downloadBtn = document.getElementById('download');
+        const flipBtn = document.getElementById('flip');
+        const flipBackBtn = document.getElementById('flipBack');
+        const card = document.getElementById('card');
+        const context = canvas.getContext('2d');
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => video.srcObject = stream)
+            .catch(error => console.error('Error accediendo a la cámara:', error));
+
+        captureBtn.addEventListener('click', () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            const imageUrl = canvas.toDataURL('image/png');
+            downloadBtn.href = imageUrl;
+            downloadBtn.download = 'captura.png';
+            downloadBtn.style.display = 'block';
+        });
+
+        flipBtn.addEventListener('click', () => {
+            card.classList.add('flipped');
+        });
+
+        flipBackBtn.addEventListener('click', () => {
+            card.classList.remove('flipped');
+        });
+    </script>
+</body>
+</html>

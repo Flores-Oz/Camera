@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cámara Interactiva</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: white;
+            margin: 0;
+        }
+        .container {
+            width: 300px;
+            height: 500px;
+            position: relative;
+            perspective: 1000px;
+        }
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        .side {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 5px;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
+        }
+        .front {
+            background-color: #e6007e;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        .back {
+            background-color: #fff;
+            transform: rotateY(180deg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .lens {
+            width: 120px;
+            height: 120px;
+            background-color: black;
+            border-radius: 50%;
+            border: 5px solid #444;
+            box-shadow: inset 0 0 10px rgba(255,255,255,0.3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .lens::before {
+            content: "";
+            width: 70px;
+            height: 70px;
+            background-color: gray;
+            border-radius: 50%;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+        .side-button {
+            width: 30px;
+            height: 80px;
+            background-color: black;
+            position: absolute;
+            left: -10px;
+            top: 50%;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card" id="card">
+            <div class="side front">
+                <div class="lens"></div>
+            </div>
+            <div class="side back">
+                <div class="lens"></div>
+                <p style="color: black; font-size: 20px;">Galería de Fotos</p>
+            </div>
+        </div>
+        <div class="side-button" id="captureButton"></div>
+    </div>
+
+    <script>
+        const captureButton = document.getElementById('captureButton');
+        const card = document.getElementById('card');
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        const frame = new Image();
+        frame.src = "marco.png"; // Asegúrate de que la imagen esté disponible
+
+        // Cuando la imagen del marco esté completamente cargada
+        frame.onload = () => {
+            captureButton.addEventListener('click', async () => {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    const video = document.createElement('video');
+                    video.srcObject = stream;
+                    await new Promise(resolve => video.onloadedmetadata = resolve);
+
+                    // Configurar el canvas con el tamaño del video
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+
+                    // Dibujar el video en el canvas
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                    // Detener el stream de la cámara
+                    stream.getTracks().forEach(track => track.stop());
+
+                    // Aquí agregamos el marco solo como borde
+                    const frameWidth = canvas.width;
+                    const frameHeight = canvas.height;
+                    context.drawImage(frame, 0, 0, frameWidth, frameHeight); // El marco como borde, no fondo
+
+                    // Convertir el canvas a un archivo PNG y descargarlo
+                    canvas.toBlob(blob => {
+                        const link = document.createElement('a');
+                        const url = URL.createObjectURL(blob); // Crear un objeto URL
+                        link.href = url;
+                        link.download = 'captura_con_marco.png';
+                        document.body.appendChild(link);
+                        link.click();
+                        setTimeout(() => {
+                            document.body.removeChild(link); // Eliminar el enlace temporal después de la descarga
+                            window.URL.revokeObjectURL(url); // Liberar el objeto URL
+                        }, 0);
+                    }, 'image/png');
+                } catch (error) {
+                    console.error('Error al capturar la foto:', error);
+                }
+            });
+        };
+
+        card.addEventListener('dblclick', () => {
+            card.classList.toggle('flipped');
+        });
+    </script>
+</body>
+</html>
