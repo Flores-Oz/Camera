@@ -119,6 +119,7 @@
             border-radius: 3px;
         }
         .back-section {
+            position: relative;
             display: none;
             background-color: #e6007e;
             position: relative;
@@ -135,6 +136,7 @@
             align-items: center;
             justify-content: center;
             margin-top: 10px;
+            z-index: 10;
         }
         .video-cover {
             position: absolute;
@@ -145,6 +147,67 @@
             border-radius: 3px;
             display: none; /* Oculto por defecto */
             z-index: 10;
+        }
+
+        .carousel {
+            width: 350px; /* Tamaño del carrusel */
+            height: 300px;
+            position: relative;
+            background-color: white;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            flex-direction: column; /* Para que las flechas queden abajo */
+            margin-right:  55px;
+        }
+        
+        .carousel img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+/* Control de las flechas */
+.carousel-controls {
+    position: absolute;
+    bottom: 100px; /* Ubicarlas a 10px desde el borde inferior */
+    right: -50px; /* Ubicarlas a 10px desde el borde derecho */
+    left:  -30px;
+    display: flex;
+    justify-content: space-between; /* Asegura que las flechas estén separadas */
+    width: 80px; /* Ajustar el espacio entre las flechas */
+    z-index: 20;
+}
+
+        
+        
+        .triangle {
+            width: 0;
+            height: 0;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        
+        /* Triángulo izquierdo */
+        .prev {
+            border-left: 40px solid black;  /* Crea el triángulo */
+            border-top: 25px solid transparent;
+            border-bottom: 25px solid transparent;
+        }
+        
+        /* Triángulo derecho */
+        .next {
+            border-right: 40px solid black;
+            border-top: 25px solid transparent;
+            border-bottom: 25px solid transparent;
+        }
+        
+        .prev:hover, .next:hover {
+            opacity: 0.7;
         }
         
     </style>
@@ -165,7 +228,14 @@
         <div class="lens" style="margin-top: 10px;"></div>
         <!-- Cambiar Pagina -->
         <div class="back-section" id="backSection">
-            ¡Has hecho clic en el botón! Esta es una nueva sección.
+            <div class="carousel">
+                <img id="carouselImage" src="marco.png" alt="Imagen del carrusel">
+           
+            </div>
+            <div class="carousel-controls">
+                <button class="triangle prev" onclick="prevImage()"></button>
+                <button class="triangle next" onclick="nextImage()"></button>
+            </div>
         </div>
     </div>
     <script>
@@ -198,6 +268,13 @@
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+         // Espera antes de detener la cámara
+    setTimeout(() => {
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+        }
+    }, 100); 
     
     })
         //
@@ -296,6 +373,22 @@ navigator.mediaDevices.getUserMedia({ video: true })
         video.srcObject = stream;
     })
     .catch(error => console.error('Error accediendo a la cámara:', error));
+}
+
+
+//Imagenes
+const images = ["Diend.png", "marco.png", "imagenes/img3.jpg"]; 
+let currentIndex = 0;
+const carouselImage = document.getElementById("carouselImage");
+
+function prevImage() {
+    currentIndex = (currentIndex - 1 + images.length) % images.length;
+    carouselImage.src = images[currentIndex];
+}
+
+function nextImage() {
+    currentIndex = (currentIndex + 1) % images.length;
+    carouselImage.src = images[currentIndex];
 }
 
     </script>
