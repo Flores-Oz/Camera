@@ -3,128 +3,301 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cámara y Galería</title>
+    <title>Camera</title>
+    <link rel="icon" href="Diend.png" type="image/png">
     <style>
         body {
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #1a1a1a;
+            background-color: white;
             margin: 0;
-            font-family: Arial, sans-serif;
         }
-        .container {
-            width: 90%;
-            max-width: 400px;
-            perspective: 1000px;
-        }
-        .card {
-            width: 100%;
-            height: 500px;
+        .camera {
+            width: 450px;
+            height: 650px;
+            background-color: #e6007e;
             position: relative;
-            transform-style: preserve-3d;
-            transition: transform 0.6s;
-        }
-        .card.flipped {
-            transform: rotateY(180deg);
-        }
-        .side {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-        .front {
-            background: #222;
+            border-radius: 5px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
+            margin-top: 10px; /* Bajar la cámara 10px */
+            transform-style: preserve-3d;
+            transition: transform 1s ease; /* Animación de volteo */
         }
-        .back {
-            background: #fff;
-            transform: rotateY(180deg);
-            padding: 10px;
-            overflow-y: auto;
+        .camera.flipped {
+            transform: rotateY(180deg); /* Voltear la cámara */
         }
-        video, canvas {
-            width: 100%;
-            border-radius: 10px;
+        .lens {
+            width: 160px;
+            height: 160px;
+            background-color: black;
+            border-radius: 50%;
+            position: relative;
+            border: 5px solid #444;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: inset 0 0 10px rgba(255,255,255,0.3);
         }
-        button {
-            margin-top: 10px;
-            padding: 10px;
-            width: 100%;
-            border: none;
+        .lens::before {
+            content: "";
+            width: 90px;
+            height: 90px;
+            background-color: gray;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+        .top-viewfinder {
+            width: 180px;
+            height: 90px;
+            background-color: black;
+            position: absolute;
+            top: -70px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .top-viewfinder::after {
+            content: "";
+            width: 120px;
+            height: 60px;
+            background-color: white;
+            position: absolute;
+            border-radius: 3px;
+        }
+        .side-button {
+            width: 40px;
+            height: 140px;
+            background-color: black;
+            position: absolute;
+            left: -15px;
+            top: 40%;
+            border-radius: 5px;
+        }
+        .shutter-button {
+            width: 50px;
+            height: 50px;
+            background-color: black;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            border-radius: 50%;
+            box-shadow: inset 0 0 5px rgba(255,255,255,0.3);
             cursor: pointer;
-            font-size: 16px;
-            border-radius: 5px;
+            transition: transform 0.3s ease; /* Añadido para la animación */
         }
-        .capture { background: #28a745; color: white; }
-        .flip { background: #007bff; color: white; }
-        .download { background: #dc3545; color: white; display: none; }
-        .gallery img {
+        .shutter-button.flipped {
+            transform: rotate(180deg); /* Girar el botón */
+        }
+        /* Estilo para el contenedor del video con el marco */
+        .video-frame {
+            width: 120px;
+            height: 70px;
+            position: absolute;
+            top: -60px; /* Mismo valor que el top-viewfinder */
+            background-color: white;
+            border-radius: 3px;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        video {
             width: 100%;
-            margin-bottom: 10px;
-            border-radius: 5px;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 3px;
         }
+        .back-section {
+            display: none;
+            background-color: #e6007e;
+            position: relative;
+            border-radius: 5px;
+            top: 0;
+            left: 0;
+            width: 300px;
+            height:  500px;
+            text-align: center;
+            padding-top: 100px;
+            color: black;
+            font-size: 24px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 10px;
+        }
+        .video-cover {
+            position: absolute;
+            top: -60px; /* Mismo valor que .video-frame */
+            width: 120px;
+            height: 70px;
+            background-color: black; /* Oculta el video */
+            border-radius: 3px;
+            display: none; /* Oculto por defecto */
+            z-index: 10;
+        }
+        
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="card" id="card">
-            <div class="side front">
-                <video id="video" autoplay></video>
-                <canvas id="canvas" style="display:none;"></canvas>
-                <button class="capture" id="capture">Tomar Foto</button>
-                <a class="download" id="download">Descargar Foto</a>
-                <button class="flip" id="flip">Ver Galería</button>
-            </div>
-            <div class="side back">
-                <div class="gallery">
-                    <img src="https://via.placeholder.com/400" alt="Imagen 1">
-                    <img src="https://via.placeholder.com/400" alt="Imagen 2">
-                    <img src="https://via.placeholder.com/400" alt="Imagen 3">
-                </div>
-                <button class="flip" id="flipBack">Volver a la Cámara</button>
-            </div>
+    <div class="camera">
+        <div class="top-viewfinder"></div>
+        <div class="shutter-button" id="shutterButton"></div>
+        <div class="side-button" id="captureButton"></div>
+        <!-- Contenedor del video con el marco -->
+        <div class="video-frame">
+            <video id="video" autoplay></video>
+        </div>
+        <div class="video-cover" id="videoCover"></div>
+
+        <!-- Ambos lentes -->
+        <div class="lens"></div>
+        <div class="lens" style="margin-top: 10px;"></div>
+        <!-- Cambiar Pagina -->
+        <div class="back-section" id="backSection">
+            ¡Has hecho clic en el botón! Esta es una nueva sección.
         </div>
     </div>
-
     <script>
+        const videoCover = document.getElementById('videoCover');
+        const lenses = document.querySelectorAll('.lens'); // Agrega esta línea
+        const camera = document.querySelector('.camera');
         const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const captureBtn = document.getElementById('capture');
-        const downloadBtn = document.getElementById('download');
-        const flipBtn = document.getElementById('flip');
-        const flipBackBtn = document.getElementById('flipBack');
-        const card = document.getElementById('card');
+        const shutterButton = document.getElementById('shutterButton');
+        const backSection = document.getElementById('backSection');
+        const captureButton = document.getElementById('captureButton');
+        const canvas = document.createElement('canvas');
         const context = canvas.getContext('2d');
+        const frame = new Image();
+        frame.src = "marco.png"; 
 
+        let isFlipped = false; // Variable para saber el estado de la cámara
+        let stream;
+
+        //
         navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => video.srcObject = stream)
-            .catch(error => console.error('Error accediendo a la cámara:', error));
+        .then(stream => {
+            video.srcObject = stream;
+            video.style.display = 'block';
+        })
+        .catch(error => console.error('Error accediendo a la cámara:', error));
 
-        captureBtn.addEventListener('click', () => {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-            const imageUrl = canvas.toDataURL('image/png');
-            downloadBtn.href = imageUrl;
-            downloadBtn.download = 'captura.png';
-            downloadBtn.style.display = 'block';
-        });
+        
 
-        flipBtn.addEventListener('click', () => {
-            card.classList.add('flipped');
-        });
+    captureButton.addEventListener('click', () => {
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+    })
+        //
+    
+        // Cuando la imagen del marco esté completamente cargada
+        frame.onload = () => {
+            captureButton.addEventListener('click', async () => {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                    const video = document.createElement('video');
+                    video.srcObject = stream;
+                    await new Promise(resolve => video.onloadedmetadata = resolve);
 
-        flipBackBtn.addEventListener('click', () => {
-            card.classList.remove('flipped');
-        });
+                    // Configurar el canvas con el tamaño del video
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+
+                    // Dibujar el video en el canvas
+                    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                    // Detener el stream de la cámara
+                    stream.getTracks().forEach(track => track.stop());
+
+                    // Aquí agregamos el marco solo como borde
+                    const frameWidth = canvas.width;
+                    const frameHeight = canvas.height;
+                    context.drawImage(frame, 0, 0, frameWidth, frameHeight); // El marco como borde, no fondo
+
+                    // Convertir el canvas a un archivo PNG y descargarlo
+                    canvas.toBlob(blob => {
+                        const link = document.createElement('a');
+                        const url = URL.createObjectURL(blob); // Crear un objeto URL
+                        link.href = url;
+                        link.download = 'captura_con_marco.png';
+                        document.body.appendChild(link);
+                        link.click();
+                        setTimeout(() => {
+                            document.body.removeChild(link); // Eliminar el enlace temporal después de la descarga
+                            window.URL.revokeObjectURL(url); // Liberar el objeto URL
+                        }, 0);
+                    }, 'image/png');
+                } catch (error) {
+                    console.error('Error al capturar la foto:', error);
+                } 
+            });  
+        };
+               // Función para alternar la vista
+       
+// Iniciar la cámara al cargar la página
+navigator.mediaDevices.getUserMedia({ video: true })
+.then(userStream => {
+    stream = userStream;
+    video.srcObject = stream;
+    video.style.display = 'block';
+})
+.catch(error => console.error('Error accediendo a la cámara:', error));
+
+// Alternar la vista con animación
+shutterButton.addEventListener('click', () => {
+isFlipped = !isFlipped; // Alternar estado
+camera.classList.toggle('flipped'); // Activar animación de volteo
+
+if (isFlipped) {
+    // Esperar la animación antes de mostrar la back-section y ocultar la cámara
+    setTimeout(() => {
+        backSection.style.display = 'block';
+        video.style.display = 'none';
+        lenses.forEach(lens => lens.style.display = 'none');
+        videoCover.style.display = 'block'; 
+        stopCamera(); // Detener la cámara
+    }, 1000); // Tiempo de la animación
+} else {
+    // Ocultar la back-section y mostrar la cámara después de la animación
+    setTimeout(() => {
+        backSection.style.display = 'none';
+        video.style.display = 'block';
+        lenses.forEach(lens => lens.style.display = 'block');
+        videoCover.style.display = 'none'; // Oculta el cuadro negro
+        startCamera(); // Reiniciar la cámara
+    }, 1000); // Tiempo de la animación
+}
+});
+
+// Función para detener la cámara
+function stopCamera() {
+if (stream) {
+    stream.getTracks().forEach(track => track.stop());
+}
+}
+
+// Función para reiniciar la cámara
+function startCamera() {
+navigator.mediaDevices.getUserMedia({ video: true })
+    .then(userStream => {
+        stream = userStream;
+        video.srcObject = stream;
+    })
+    .catch(error => console.error('Error accediendo a la cámara:', error));
+}
+
     </script>
 </body>
 </html>
