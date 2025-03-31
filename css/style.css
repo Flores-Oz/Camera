@@ -1,0 +1,201 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: white;
+    margin: 0;
+}
+.camera {
+    width: 450px;
+    height: 650px;
+    background-color: #e6007e;
+    position: relative;
+    border-radius: 5px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
+    margin-top: 10px; /* Bajar la cámara 10px */
+    transform-style: preserve-3d;
+    transition: transform 1s ease; /* Animación de volteo */
+}
+.camera.flipped {
+    transform: rotateY(180deg); /* Voltear la cámara */
+}
+.lens {
+    width: 160px;
+    height: 160px;
+    background-color: black;
+    border-radius: 50%;
+    position: relative;
+    border: 5px solid #444;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.3);
+}
+.lens::before {
+    content: "";
+    width: 90px;
+    height: 90px;
+    background-color: gray;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+}
+.top-viewfinder {
+    width: 180px;
+    height: 90px;
+    background-color: black;
+    position: absolute;
+    top: -70px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.top-viewfinder::after {
+    content: "";
+    width: 120px;
+    height: 60px;
+    background-color: white;
+    position: absolute;
+    border-radius: 3px;
+}
+.side-button {
+    width: 40px;
+    height: 140px;
+    background-color: black;
+    position: absolute;
+    left: -15px;
+    top: 40%;
+    border-radius: 5px;
+}
+.shutter-button {
+    width: 50px;
+    height: 50px;
+    background-color: black;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 5px rgba(255,255,255,0.3);
+    cursor: pointer;
+    transition: transform 0.3s ease; /* Añadido para la animación */
+}
+.shutter-button.flipped {
+    transform: rotate(180deg); /* Girar el botón */
+}
+/* Estilo para el contenedor del video con el marco */
+.video-frame {
+    width: 120px;
+    height: 70px;
+    position: absolute;
+    top: -60px; /* Mismo valor que el top-viewfinder */
+    background-color: white;
+    border-radius: 3px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 3px;
+}
+.back-section {
+    position: relative;
+    display: none;
+    background-color: #e6007e;
+    position: relative;
+    border-radius: 5px;
+    top: 0;
+    left: 0;
+    width: 300px;
+    height:  500px;
+    text-align: center;
+    padding-top: 100px;
+    color: black;
+    font-size: 24px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    z-index: 10;
+}
+.video-cover {
+    position: absolute;
+    top: -60px; /* Mismo valor que .video-frame */
+    width: 120px;
+    height: 70px;
+    background-color: black; /* Oculta el video */
+    border-radius: 3px;
+    display: none; /* Oculto por defecto */
+    z-index: 10;
+}
+
+.carousel {
+    width: 350px; /* Tamaño del carrusel */
+    height: 300px;
+    position: relative;
+    background-color: white;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    flex-direction: column; /* Para que las flechas queden abajo */
+    margin-right:  55px;
+}
+
+.carousel img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+/* Control de las flechas */
+.carousel-controls {
+position: absolute;
+bottom: 100px; /* Ubicarlas a 10px desde el borde inferior */
+right: -50px; /* Ubicarlas a 10px desde el borde derecho */
+left:  -30px;
+display: flex;
+justify-content: space-between; /* Asegura que las flechas estén separadas */
+width: 80px; /* Ajustar el espacio entre las flechas */
+z-index: 20;
+}
+
+.triangle {
+    width: 0;
+    height: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+/* Triángulo izquierdo */
+.prev {
+    border-left: 40px solid black;  /* Crea el triángulo */
+    border-top: 25px solid transparent;
+    border-bottom: 25px solid transparent;
+}
+
+/* Triángulo derecho */
+.next {
+    border-right: 40px solid black;
+    border-top: 25px solid transparent;
+    border-bottom: 25px solid transparent;
+}
+
+.prev:hover, .next:hover {
+    opacity: 0.7;
+}
