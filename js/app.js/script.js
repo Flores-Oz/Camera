@@ -61,7 +61,15 @@ frame.onload = () => {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
             const video = document.createElement('video');
             video.srcObject = stream;
-            await new Promise(resolve => video.onloadedmetadata = resolve);
+            
+            await new Promise(resolve => {
+                video.onloadedmetadata = () => {
+                    video.play(); // Asegurar que el video comience
+                    resolve();
+                };
+            })
+
+            await new Promise(resolve => setTimeout(resolve, 500)); // Esperar a que la cámara se active
 
             // Configurar el canvas con el tamaño del video
             canvas.width = video.videoWidth;
@@ -78,6 +86,9 @@ frame.onload = () => {
             const frameHeight = canvas.height;
             context.drawImage(frame, 0, 0, frameWidth, frameHeight); // El marco como borde, no fondo
 
+              // Detener la cámara después de capturar
+           //stream.getTracks().forEach(track => track.stop());
+        
             // Convertir el canvas a un archivo PNG y descargarlo
             canvas.toBlob(blob => {
                 const link = document.createElement('a');
