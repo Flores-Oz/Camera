@@ -79,7 +79,7 @@ frame.onload = () => {
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
             // Detener el stream de la cámara
-            stream.getTracks().forEach(track => track.stop());
+            //stream.getTracks().forEach(track => track.stop());
 
             // Aquí agregamos el marco solo como borde
             const frameWidth = canvas.width;
@@ -102,6 +102,9 @@ frame.onload = () => {
                     window.URL.revokeObjectURL(url); // Liberar el objeto URL
                 }, 0);
             }, 'image/png');
+
+            video.srcObject = stream;
+
         } catch (error) {
             console.error('Error al capturar la foto:', error);
         } 
